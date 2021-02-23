@@ -42,13 +42,15 @@ class Model:
         print(f"Start with {model_name}{memo}")
     
     def get_model(self, model_name, load_model=False):
-        if model_name == 'xception':
+        if model_name == 'vanilla':
+            model = models.vanilla_unet.get_model(self.input_shape, self.num_classes)
+        if model_name == 'xception_3d':
             model = models.xception_unet_3d.get_model(self.input_shape, self.num_classes)
-        elif model_name == 'dense':
+        elif model_name == 'dense_3d':
             model = models.dense_unet_3d.get_model(self.input_shape, self.num_classes)
-        elif model_name == 'resnet':
+        elif model_name == 'resnet_3d':
             model = models.res_unet_3d.get_model(self.input_shape, self.num_classes)
-        elif model_name == 'vanilla':
+        elif model_name == 'vanilla_3d':
             model = models.vanilla_unet_3d.get_model(self.input_shape, self.num_classes)
         else:
             raise "Please select from (xception, dense, resnet, vanilla)"
