@@ -1,6 +1,7 @@
 from setuptools import find_packages, setup
 
 # https://medium.com/analytics-vidhya/how-to-create-a-python-library-7d5aea80cc3f
+# https://towardsdatascience.com/make-your-own-python-package-6d08a400fc2d
 
 setup(
     name='junet',
