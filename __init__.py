@@ -1,2 +1,2 @@
-from . import data
-
+from .train import Model
+import junet.optimizers
