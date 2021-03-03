@@ -44,7 +44,7 @@ class Model:
     def get_model(self, model_name, load_model=False):
         if model_name == 'vanilla':
             model = models.vanilla_unet.get_model(self.input_shape, self.num_classes)
-        if model_name == 'xception_3d':
+        elif model_name == 'xception_3d':
             model = models.xception_unet_3d.get_model(self.input_shape, self.num_classes)
         elif model_name == 'dense_3d':
             model = models.dense_unet_3d.get_model(self.input_shape, self.num_classes)
@@ -53,7 +53,7 @@ class Model:
         elif model_name == 'vanilla_3d':
             model = models.vanilla_unet_3d.get_model(self.input_shape, self.num_classes)
         else:
-            raise "Please select from (xception, dense, resnet, vanilla)"
+            raise "Please select from (vanilla, xception_3d, dense_3d, resnet_3d, vanilla_3d)"
         print(f'Model is {model_name}')
         
         # Load Model
