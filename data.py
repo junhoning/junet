@@ -102,7 +102,7 @@ class Dataset:
             aug_func = preprocess_funcs[aug_name]
             image, label = aug_func(image, label)
         
-        if self.num_dims == 3
+        if self.num_dims == 3:
             image = image[..., tf.newaxis]
         label = tf.one_hot(label, self.num_classes)
         
