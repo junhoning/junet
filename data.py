@@ -8,13 +8,47 @@ class Dataset:
         self.batch_size = batch_size
         self.augmentations = augmentations
         self.is_training = True
+        self.num_dims = len(self.input_shape)-1
+
+    def _parse_image_function_3d(self, example_proto):
+
+        image_feature_description = {
+            'height': tf.io.FixedLenFeature([], tf.int64),
+            'width': tf.io.FixedLenFeature([], tf.int64),
+            'depth': tf.io.FixedLenFeature([], tf.int64),
+            'image': tf.io.FixedLenFeature([], tf.string),
+            'label': tf.io.FixedLenFeature([], tf.string),
+            
+            'min_value': tf.io.FixedLenFeature([], tf.int64),
+            'max_value': tf.io.FixedLenFeature([], tf.int64)
+        }
+
+        return tf.io.parse_single_example(example_proto, image_feature_description)
+
+    def data_reader_3d(self, image_features):
+        image_raw = image_features['image']
+        label_raw = image_features['label']
+
+        height = image_features['height']
+        width = image_features['width']
+        depth = image_features['depth']
+
+        image = tf.io.decode_raw(image_raw, tf.uint8)
+        # image = (image - image_features['min_value']) / (image_features['max_value'] - image_features['min_value'])
+        image = image / 255
+        image = tf.reshape(image, [height, width, depth])
+
+        label = tf.io.decode_raw(label_raw, tf.uint8)
+        label = tf.reshape(label, [height, width, depth])
+        
+        return image, label
 
     def _parse_image_function(self, example_proto):
 
         image_feature_description = {
             'height': tf.io.FixedLenFeature([], tf.int64),
             'width': tf.io.FixedLenFeature([], tf.int64),
-            'depth': tf.io.FixedLenFeature([], tf.int64),
+            'channel': tf.io.FixedLenFeature([], tf.int64),
             'image': tf.io.FixedLenFeature([], tf.string),
             'label': tf.io.FixedLenFeature([], tf.string),
             
@@ -30,15 +64,15 @@ class Dataset:
 
         height = image_features['height']
         width = image_features['width']
-        depth = image_features['depth']
+        channel = image_features['channel']
 
         image = tf.io.decode_raw(image_raw, tf.uint8)
         # image = (image - image_features['min_value']) / (image_features['max_value'] - image_features['min_value'])
         image = image / 255
-        image = tf.reshape(image, [height, width, depth])
+        image = tf.reshape(image, [height, width, channel])
 
         label = tf.io.decode_raw(label_raw, tf.uint8)
-        label = tf.reshape(label, [height, width, depth])
+        label = tf.reshape(label, [height, width])
         
         return image, label
 
@@ -68,7 +102,8 @@ class Dataset:
             aug_func = preprocess_funcs[aug_name]
             image, label = aug_func(image, label)
         
-        image = image[..., tf.newaxis]
+        if self.num_dims == 3
+            image = image[..., tf.newaxis]
         label = tf.one_hot(label, self.num_classes)
         
         return image, tf.cast(label, tf.float32)
@@ -102,9 +137,13 @@ class Dataset:
         dataset = tf.data.TFRecordDataset(filename)
         if self.is_training:
             dataset = dataset.shuffle(100)
-        dataset = dataset.map(self._parse_image_function)
-        dataset = dataset.map(self.data_reader)
-
+        if self.num_dims == 2:
+            dataset = dataset.map(self._parse_image_function)
+            dataset = dataset.map(self.data_reader)
+        elif self.num_dims == 3:
+            dataset = dataset.map(self._parse_image_function_3d)
+            dataset = dataset.map(self.data_reader_3d)
+        
         dataset = dataset.map(self.preprocess_data)
         dataset = dataset.batch(self.batch_size)
         return dataset
