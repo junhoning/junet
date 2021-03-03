@@ -90,7 +90,10 @@ class Dataset:
     @tf.function
     def resize_data(self, image, label):
         image = tf.image.resize(image, self.input_shape[:-1])
+
+        label = label[..., tf.newaxis]
         label = tf.image.resize(label, self.input_shape[:-1], method='nearest')
+        label = tf.squeeze(label)
         return image, label
 
 
@@ -102,7 +105,6 @@ class Dataset:
             aug_func = preprocess_funcs[aug_name]
             image, label = aug_func(image, label)
         
-        print("Num Dims", self.num_dims)
         if self.num_dims == 3:
             image = image[..., tf.newaxis]
         label = tf.one_hot(label, self.num_classes)
