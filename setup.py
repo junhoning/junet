@@ -11,7 +11,7 @@ setup(
     author='June',
     license='MIT',
     install_requires=[],
-    setup_requires=['tensorflow'],
-    tests_require=['tensorflow'],
+    setup_requires=['tensorflow', 'tensorflow_addons'],
+    tests_require=['tensorflow', 'tensorflow_addons'],
     test_suite='test',
 )
