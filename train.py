@@ -123,9 +123,9 @@ class Model:
         self.test_accuracy(labels, predictions)
         return predictions
 
-    def get_dataset(self, train_filename, test_filename, batch_size=1):
-        self.train_ds = Dataset(self.input_shape, self.num_classes, batch_size).get_dataset(train_filename)
-        self.test_ds = Dataset(self.input_shape, self.num_classes, batch_size).get_dataset(test_filename, is_training=False)
+    def get_dataset(self, train_filename, test_filename, augmentations, batch_size=1):
+        self.train_ds = Dataset(self.input_shape, self.num_classes, batch_size, augmentations, is_training=True).get_dataset(train_filename)
+        self.test_ds = Dataset(self.input_shape, self.num_classes, batch_size, augmentations, is_training=False).get_dataset(test_filename)
     
     def normalization(self, image):
         return (image - np.min(image)) / (np.max(image) - np.min(image))

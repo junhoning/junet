@@ -2,10 +2,11 @@ import tensorflow as tf
 import numpy as np
 
 class Dataset:
-    def __init__(self, input_shape, num_classes, batch_size):
+    def __init__(self, input_shape, num_classes, batch_size, augmentations, is_training):
         self.input_shape = input_shape
         self.num_classes = num_classes
         self.batch_size = batch_size
+        self.is_training = True
 
     def _parse_image_function(self, example_proto):
 
@@ -45,15 +46,26 @@ class Dataset:
         
 
     @tf.function
-    def random_crop(self, image, label, crop_shape, seed=1):
-        image = tf.image.random_crop(image, crop_shape, seed=seed)
-        label = tf.image.random_crop(label, crop_shape, seed=seed)
+    def random_crop(self, image, label, seed=1):
+        image = tf.image.random_crop(image, self.input_shape[:-1], seed=seed)
+        label = tf.image.random_crop(label, self.input_shape[:-1], seed=seed)
+        return image, label
+
+
+    @tf.function
+    def resize_data(self, image, label):
+        image = tf.image.resize(image, self.input_shape[:-1])
+        label = tf.image.resize(label, self.input_shape[:-1], method='nearest')
         return image, label
 
 
     def preprocess_data(self, image, label):
 
-        image, label = self.random_crop(image, label, self.input_shape[:-1])
+        preprocess_funcs = {'resize' : self.resize_data, 'random_crop' : self.random_crop}
+        
+        for aug_name in self.augmentations:
+            aug_func = preprocess_funcs[aug_name]
+            image, label = aug_func(image, label)
         
         image = image[..., tf.newaxis]
         label = tf.one_hot(label, self.num_classes)
@@ -66,7 +78,7 @@ class Dataset:
         image = self.normalization(image)
         
         # Cropping Image
-        input_shape = np.array([128, 128, 128])
+        input_shape = np.array(self.input_shape[:-1])
         image_shape = np.array(image.shape)
 
         pad_shape = np.stack([input_shape//2, (input_shape - image_shape % input_shape) + (input_shape//2)], -1)
@@ -85,9 +97,9 @@ class Dataset:
         return pred[64:64+image.shape[0], 64:64+image.shape[1], 64:64+image.shape[2]]
 
 
-    def get_dataset(self, filename, is_training=True):
+    def get_dataset(self, filename):
         dataset = tf.data.TFRecordDataset(filename)
-        if is_training:
+        if self.is_training:
             dataset = dataset.shuffle(100)
         dataset = dataset.map(self._parse_image_function)
         dataset = dataset.map(self.data_reader)
