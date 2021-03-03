@@ -6,6 +6,7 @@ class Dataset:
         self.input_shape = input_shape
         self.num_classes = num_classes
         self.batch_size = batch_size
+        self.augmentations = augmentations
         self.is_training = True
 
     def _parse_image_function(self, example_proto):
@@ -62,7 +63,7 @@ class Dataset:
     def preprocess_data(self, image, label):
 
         preprocess_funcs = {'resize' : self.resize_data, 'random_crop' : self.random_crop}
-        
+
         for aug_name in self.augmentations:
             aug_func = preprocess_funcs[aug_name]
             image, label = aug_func(image, label)
