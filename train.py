@@ -167,8 +167,7 @@ class Model:
                 tf.summary.scalar('dice_score', self.train_dice.result(), step=epoch)
 
                 disp_idx = np.random.randint(images.shape[1])
-                if self.num_dims
-
+                
                 def crop_dim(image):
                     if self.num_dims == 3:
                         return image[0, :, :, :, :]
