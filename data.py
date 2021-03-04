@@ -152,7 +152,7 @@ class Dataset:
             # test_size = int(0.15 * num_ds)
 
             dataset = tf.data.TFRecordDataset(filename, compression_type)
-            dataset = dataset.shuffle()
+            dataset = dataset.shuffle(num_ds)
 
             train_dataset = dataset.take(train_size)
             test_dataset = dataset.skip(train_size)
@@ -183,7 +183,6 @@ class Dataset:
 
         else:
             dataset = tf.data.TFRecordDataset(filename, compression_type)
-            dataset = dataset.shuffle()
 
             if self.is_training:
                 dataset = dataset.shuffle(100)
