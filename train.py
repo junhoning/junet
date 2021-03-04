@@ -19,7 +19,6 @@ class Model:
                 save_dir,
                 input_shape=(128, 128, 128, 1),
                 num_classes=3,
-                batch_size=1,
                 model_name='vanilla',
                 load_model=False,
                 memo='',
@@ -27,7 +26,6 @@ class Model:
         self.model_name = model_name.lower()
         self.input_shape = input_shape
         self.num_classes = num_classes
-        self.batch_size = batch_size
         self.train_time = datetime.now().strftime('%Y%m%d-%H%M%S')
         self.save_dir = save_dir
         self.memo = memo
@@ -132,7 +130,7 @@ class Model:
     def get_dataset(self, train_filename, test_filename, augmentations, batch_size):
         # self.train_ds = Dataset(self.input_shape, self.num_classes, batch_size, augmentations, is_training=True).get_dataset(train_filename)
         # self.test_ds = Dataset(self.input_shape, self.num_classes, batch_size, augmentations, is_training=False).get_dataset(test_filename)
-        self.train_ds, self.test_ds = Dataset(self.input_shape, self.num_classes, self.batch_size, augmentations, is_training=False).get_dataset(test_filename)
+        self.train_ds, self.test_ds = Dataset(self.input_shape, self.num_classes, batch_size, augmentations, is_training=False).get_dataset(test_filename)
     
     def normalization(self, image):
         return (image - np.min(image)) / (np.max(image) - np.min(image))
