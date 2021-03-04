@@ -75,6 +75,8 @@ class Dataset:
         label = tf.io.decode_image(label_raw) # label = tf.io.decode_raw(label_raw, tf.uint8)
         label = tf.reshape(label, [height, width])
         
+        label = tf.where(label==255, 1, 0)
+        
         return image, label
 
     def normalization(self, image):
