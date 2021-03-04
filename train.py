@@ -163,7 +163,7 @@ class Model:
                 if self.num_dims == 3:
                     return image[0, :, :, :, tf.newaxis]
                 else:
-                    return image
+                    return image[:, :, :, tf.newaxis]
 
             print("Start Training : ", datetime.now(), ', @', self.save_name)
             for images, labels in self.train_ds:  # notebook.tqdm(self.train_ds):  
