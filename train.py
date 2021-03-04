@@ -100,32 +100,32 @@ class Model:
         with tf.GradientTape() as tape:
             # training=True is only needed if there are layers with different
             # behavior during training versus inference (e.g. Dropout).
-            predictions = self.model(images, training=True)
+            self.predictions = self.model(images, training=True)
             Losses = losses.Losses('soft_dice_loss')
-            loss = Losses.loss_function(labels, predictions)
+            loss = Losses.loss_function(labels, self.predictions)
             # en_loss = tf.keras.losses.categorical_crossentropy(labels, predictions)
             
         gradients = tape.gradient(loss, self.model.trainable_variables)
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
 
         self.train_loss(loss)
-        self.train_dice(metrics.dice(labels, predictions))
-        self.train_accuracy(labels, predictions)
-        return predictions
+        self.train_dice(metrics.dice(labels, self.predictions))
+        self.train_accuracy(labels, self.predictions)
+        return self.predictions
         
 
     @tf.function
     def test_step(self, images, labels):
         # training=False is only needed if there are layers with different
         # behavior during training versus inference (e.g. Dropout).
-        predictions = self.model(images, training=False)
+        self.predictions = self.model(images, training=False)
         Losses = losses.Losses('soft_dice_loss')
-        loss = Losses.loss_function(labels, predictions)
+        loss = Losses.loss_function(labels, self.predictions)
 
         self.test_loss(loss)
-        self.test_dice(metrics.dice(labels, predictions))
-        self.test_accuracy(labels, predictions)
-        return predictions
+        self.test_dice(metrics.dice(labels, self.predictions))
+        self.test_accuracy(labels, self.predictions)
+        return self.predictions
 
     def get_dataset(self, train_filename, test_filename, augmentations, batch_size):
         # self.train_ds = Dataset(self.input_shape, self.num_classes, batch_size, augmentations, is_training=True).get_dataset(train_filename)
