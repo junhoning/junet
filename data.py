@@ -137,22 +137,64 @@ class Dataset:
         return pred[64:64+image.shape[0], 64:64+image.shape[1], 64:64+image.shape[2]]
 
 
-    def get_dataset(self, filename):
+    def get_dataset(self, filename, split_rate=0.7):
         if filename.split(".")[-1] == 'gzip':
             compression_type = 'GZIP'
         else:
             compression_type = None
+
+
+        if split_rate > 0:
+            num_ds = [1 for _ in tf.data.TFRecordDataset(filename, compression_type='GZIP')]
+
+            train_size = int(split_rate * num_ds)
+            val_size = int((1-split_rate) * num_ds)
+            # test_size = int(0.15 * num_ds)
+
+            dataset = tf.data.TFRecordDataset(filename, compression_type)
+            dataset = dataset.shuffle()
+
+            train_dataset = dataset.take(train_size)
+            test_dataset = dataset.skip(train_size)
+            # val_dataset = test_dataset.skip(test_size)
+            test_dataset = test_dataset.take(val_size)
+
+            if self.num_dims == 2:
+                train_dataset = train_dataset.map(self._parse_image_function)
+                train_dataset = train_dataset.map(self.data_reader)
+
+                test_dataset = test_dataset.map(self._parse_image_function)
+                test_dataset = test_dataset.map(self.data_reader)
+
+            elif self.num_dims == 3:
+                train_dataset = train_dataset.map(self._parse_image_function_3d)
+                train_dataset = train_dataset.map(self.data_reader_3d)
+
+                test_dataset = test_dataset.map(self._parse_image_function_3d)
+                test_dataset = test_dataset.map(self.data_reader_3d)
             
-        dataset = tf.data.TFRecordDataset(filename, compression_type)
-        if self.is_training:
-            dataset = dataset.shuffle(100)
-        if self.num_dims == 2:
-            dataset = dataset.map(self._parse_image_function)
-            dataset = dataset.map(self.data_reader)
-        elif self.num_dims == 3:
-            dataset = dataset.map(self._parse_image_function_3d)
-            dataset = dataset.map(self.data_reader_3d)
-        
-        dataset = dataset.map(self.preprocess_data)
-        dataset = dataset.batch(self.batch_size)
-        return dataset
+            train_dataset = train_dataset.map(self.preprocess_data)
+            train_dataset = train_dataset.batch(self.batch_size)
+            
+            test_dataset = test_dataset.map(self.preprocess_data)
+            test_dataset = test_dataset.batch(self.batch_size)
+
+            return train_dataset, test_dataset
+
+        else:
+            dataset = tf.data.TFRecordDataset(filename, compression_type)
+            dataset = dataset.shuffle()
+
+            if self.is_training:
+                dataset = dataset.shuffle(100)
+            if self.num_dims == 2:
+                dataset = dataset.map(self._parse_image_function)
+                dataset = dataset.map(self.data_reader)
+            elif self.num_dims == 3:
+                dataset = dataset.map(self._parse_image_function_3d)
+                dataset = dataset.map(self.data_reader_3d)
+            
+            dataset = dataset.map(self.preprocess_data)
+            dataset = dataset.batch(self.batch_size)
+
+            return dataset
