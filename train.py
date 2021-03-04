@@ -173,7 +173,9 @@ class Model:
                         return images
 
             print("Start Training : ", datetime.now(), ', @', self.save_name)
-            for images, labels in self.train_ds:  # notebook.tqdm(self.train_ds):  
+            for images, labels in notebook.tqdm(self.train_ds):
+                self.train_images = images
+                self.train_labels = labels
                 preds = self.train_step(images, labels)
                 
             with train_summary_writer.as_default():
@@ -187,7 +189,9 @@ class Model:
                 tf.summary.image('preds_image', self.normalization(reduce_dim(preds)), epoch)
                 tf.summary.image('label_image', self.normalization(reduce_dim(labels)), epoch)
 
-            for images, labels in self.train_ds:  # notebook.tqdm(self.test_ds):       
+            for images, labels in notebook.tqdm(self.test_ds):
+                self.test_images = images
+                self.test_labels = labels  
                 test_preds = self.test_step(images, labels)
 
             with test_summary_writer.as_default():
