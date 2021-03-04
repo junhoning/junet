@@ -30,6 +30,7 @@ class Model:
         self.save_dir = save_dir
         self.memo = memo
         self.save_name = f'{self.train_time}_{model_name}{memo}'
+        self.num_dims = len(input_shape[:-1])
 
         if 'h_params' in kwargs:
             self.is_hparams = True
@@ -166,9 +167,23 @@ class Model:
                 tf.summary.scalar('dice_score', self.train_dice.result(), step=epoch)
 
                 disp_idx = np.random.randint(images.shape[1])
-                tf.summary.image('input_image', images[0, :, :, :, :], epoch)
-                tf.summary.image('preds_image', self.normalization(tf.argmax(preds, -1)[0, :, :, :, tf.newaxis]), epoch)
-                tf.summary.image('label_image', self.normalization(tf.argmax(labels, -1)[0, :, :, :, tf.newaxis]), epoch)
+                if self.num_dims
+
+                def crop_dim(image):
+                    if self.num_dims == 3:
+                        return image[0, :, :, :, :]
+                    else:
+                        return image
+
+                def crop_inf(image):
+                    if self.num_dims == 3:
+                        return tf.argmax(image, -1)[0, :, :, :, tf.newaxis]
+                    else:
+                        return tf.argmax(image, -1)
+
+                tf.summary.image('input_image', crop_dim(images), epoch)
+                tf.summary.image('preds_image', self.normalization(crop_inf(preds)), epoch)
+                tf.summary.image('label_image', self.normalization(crop_inf(labels)), epoch)
 
             for images, labels in self.train_ds:  # notebook.tqdm(self.test_ds):       
                 test_preds = self.test_step(images, labels)
@@ -179,9 +194,9 @@ class Model:
                 tf.summary.scalar('dice_score', self.test_dice.result(), step=epoch)
 
                 disp_idx = np.random.randint(images.shape[1])
-                tf.summary.image('input_image', images[0, :, :, :, :], epoch)
-                tf.summary.image('preds_image', self.normalization(tf.argmax(test_preds, -1)[0, :, :, :, tf.newaxis]), epoch)
-                tf.summary.image('label_image', self.normalization(tf.argmax(labels, -1)[0, :, :, :, tf.newaxis]), epoch)
+                tf.summary.image('input_image', crop_dim(images), epoch)
+                tf.summary.image('preds_image', self.normalization(crop_inf(test_preds)), epoch)
+                tf.summary.image('label_image', self.normalization(crop_inf(labels)), epoch)
 
                 if self.is_hparams:
                     hp.hparams(self.hparams)
