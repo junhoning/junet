@@ -40,6 +40,9 @@ class Model:
             self.is_hparams = False
         self.model = self.get_model(model_name, load_model)
 
+        if not os.path.exists(self.save_dir):
+            os.makedirs(self.save_dir)
+
         print(f"Start with {model_name}{memo}")
     
     def get_model(self, model_name, load_model=False):
@@ -160,14 +163,14 @@ class Model:
             def reduce_dim(image, is_argmax=True):
                 if self.num_dims == 3:
                     if is_argmax:
-                        return tf.argmax(images, -1)[0, :, :, :, tf.newaxis]
+                        return tf.argmax(images, -1)[0, ..., tf.newaxis]  # [0, :, :, :, tf.newaxis]
                     else:
-                        return images[0, :, :, :, :]
+                        return images[0]
                 else:
                     if is_argmax:
-                        return tf.argmax(images, -1)[:, :, :, tf.newaxis]
+                        return tf.argmax(images, -1)[..., tf.newaxis]
                     else:
-                        return images[:, :, :, :]
+                        return images
 
             print("Start Training : ", datetime.now(), ', @', self.save_name)
             for images, labels in self.train_ds:  # notebook.tqdm(self.train_ds):  
