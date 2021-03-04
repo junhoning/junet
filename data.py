@@ -145,7 +145,7 @@ class Dataset:
 
 
         if split_rate > 0:
-            num_ds = [1 for _ in tf.data.TFRecordDataset(filename, compression_type='GZIP')]
+            num_ds = len([1 for _ in tf.data.TFRecordDataset(filename, compression_type='GZIP')])
 
             train_size = int(split_rate * num_ds)
             val_size = int((1-split_rate) * num_ds)
