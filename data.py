@@ -64,13 +64,13 @@ class Dataset:
 
         height = image_features['height']
         width = image_features['width']
-        channel = image_features['channel']
+        # channel = image_features['channel']
 
-        image = tf.io.decode_image(image_raw) # image = tf.io.decode_raw(image_raw, tf.uint8)
+        image = tf.io.decode_image(image_raw, channels=self.input_shape[-1]) # image = tf.io.decode_raw(image_raw, tf.uint8)
         # image = (image - image_features['min_value']) / (image_features['max_value'] - image_features['min_value'])
         image = image / 255
         # image = self.normalization(image)
-        image = tf.reshape(image, [height, width, channel])
+        image = tf.reshape(image, [height, width, self.input_shape[-1]])
 
         label = tf.io.decode_image(label_raw) # label = tf.io.decode_raw(label_raw, tf.uint8)
         label = tf.reshape(label, [height, width])
