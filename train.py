@@ -161,7 +161,7 @@ class Model:
                 if is_argmax:
                     image = tf.argmax(image, -1)
                 if self.num_dims == 3:
-                    return image[0]
+                    return image[0, :, :, :, tf.newaxis]
                 else:
                     return image
 
