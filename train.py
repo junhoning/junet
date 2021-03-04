@@ -100,32 +100,32 @@ class Model:
         with tf.GradientTape() as tape:
             # training=True is only needed if there are layers with different
             # behavior during training versus inference (e.g. Dropout).
-            self.predictions = self.model(images, training=True)
+            predictions = self.model(images, training=True)
             Losses = losses.Losses('soft_dice_loss')
-            loss = Losses.loss_function(labels, self.predictions)
+            loss = Losses.loss_function(labels, predictions)
             # en_loss = tf.keras.losses.categorical_crossentropy(labels, predictions)
             
         gradients = tape.gradient(loss, self.model.trainable_variables)
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
 
         self.train_loss(loss)
-        self.train_dice(metrics.dice(labels, self.predictions))
-        self.train_accuracy(labels, self.predictions)
-        return self.predictions
+        self.train_dice(metrics.dice(labels, predictions))
+        self.train_accuracy(labels, predictions)
+        return predictions
         
 
     @tf.function
     def test_step(self, images, labels):
         # training=False is only needed if there are layers with different
         # behavior during training versus inference (e.g. Dropout).
-        self.predictions = self.model(images, training=False)
+        predictions = self.model(images, training=False)
         Losses = losses.Losses('soft_dice_loss')
-        loss = Losses.loss_function(labels, self.predictions)
+        loss = Losses.loss_function(labels, predictions)
 
         self.test_loss(loss)
-        self.test_dice(metrics.dice(labels, self.predictions))
-        self.test_accuracy(labels, self.predictions)
-        return self.predictions
+        self.test_dice(metrics.dice(labels, predictions))
+        self.test_accuracy(labels, predictions)
+        return predictions
 
     def get_dataset(self, train_filename, test_filename, augmentations, batch_size):
         # self.train_ds = Dataset(self.input_shape, self.num_classes, batch_size, augmentations, is_training=True).get_dataset(train_filename)
@@ -176,7 +176,7 @@ class Model:
             for images, labels in notebook.tqdm(self.train_ds):
                 self.train_images = images
                 self.train_labels = labels
-                preds = self.train_step(images, labels)
+                self.train_preds = self.train_step(images, labels)
                 
             with train_summary_writer.as_default():
                 tf.summary.scalar('loss_value', self.train_loss.result(), step=epoch)
@@ -186,13 +186,13 @@ class Model:
                 disp_idx = np.random.randint(images.shape[1])
 
                 tf.summary.image('input_image', reduce_dim(images, False), epoch)
-                tf.summary.image('preds_image', self.normalization(reduce_dim(preds)), epoch)
+                tf.summary.image('preds_image', self.normalization(reduce_dim(self.train_preds)), epoch)
                 tf.summary.image('label_image', self.normalization(reduce_dim(labels)), epoch)
 
             for images, labels in notebook.tqdm(self.test_ds):
                 self.test_images = images
                 self.test_labels = labels  
-                test_preds = self.test_step(images, labels)
+                self.test_preds = self.test_step(images, labels)
 
             with test_summary_writer.as_default():
                 tf.summary.scalar('loss_value', self.test_loss.result(), step=epoch)
@@ -201,7 +201,7 @@ class Model:
 
                 disp_idx = np.random.randint(images.shape[1])
                 tf.summary.image('input_image', reduce_dim(images, False), epoch)
-                tf.summary.image('preds_image', self.normalization(reduce_dim(test_preds)), epoch)
+                tf.summary.image('preds_image', self.normalization(reduce_dim(self.test_preds)), epoch)
                 tf.summary.image('label_image', self.normalization(reduce_dim(labels)), epoch)
 
                 if self.is_hparams:
