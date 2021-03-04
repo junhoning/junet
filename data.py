@@ -72,7 +72,7 @@ class Dataset:
         # image = self.normalization(image)
         image = tf.reshape(image, [height, width, channel])
 
-        label = tf.io.decode_image(label) # label = tf.io.decode_raw(label_raw, tf.uint8)
+        label = tf.io.decode_image(label_raw) # label = tf.io.decode_raw(label_raw, tf.uint8)
         label = tf.reshape(label, [height, width])
         
         return image, label
