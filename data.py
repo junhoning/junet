@@ -137,7 +137,12 @@ class Dataset:
 
 
     def get_dataset(self, filename):
-        dataset = tf.data.TFRecordDataset(filename)
+        if filename.split(".")[-1] == 'gzip':
+            compression_type = 'GZIP'
+        else:
+            compression_type = None
+            
+        dataset = tf.data.TFRecordDataset(filename, compression_type)
         if self.is_training:
             dataset = dataset.shuffle(100)
         if self.num_dims == 2:
