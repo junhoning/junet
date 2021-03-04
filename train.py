@@ -158,12 +158,16 @@ class Model:
             self.test_dice.reset_states()
 
             def reduce_dim(image, is_argmax=True):
-                if is_argmax:
-                    image = tf.argmax(image, -1)
                 if self.num_dims == 3:
-                    return image[0, :, :, :, tf.newaxis]
+                    if is_argmax:
+                        return tf.argmax(images, -1)[0, :, :, :, tf.newaxis]
+                    else:
+                        return images[0, :, :, :, :]
                 else:
-                    return image[:, :, :, tf.newaxis]
+                    if is_argmax:
+                        return tf.argmax(images, -1)[:, :, :, tf.newaxis]
+                    else:
+                        return images[:, :, :, :]
 
             print("Start Training : ", datetime.now(), ', @', self.save_name)
             for images, labels in self.train_ds:  # notebook.tqdm(self.train_ds):  
