@@ -101,7 +101,7 @@ class Dataset:
 
     @tf.function
     def padding3d(self, image, label):
-        comp = (tf.constant(self.input_shape) - image.shape)
+        comp = tf.constant(self.input_shape) - tf.constant(image.shape)
         padding = tf.where(comp > 0, tf.cast(tf.math.ceil(comp / 2), tf.int32), 0)
 
         padded_image = tf.pad(image, tf.stack([padding, padding], axis=1))
