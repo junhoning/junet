@@ -127,10 +127,10 @@ class Model:
         self.test_accuracy(labels, predictions)
         return predictions
 
-    def get_dataset(self, filename, augmentations, batch_size):
+    def get_dataset(self, filename, augmentations, batch_size, split_rate=0.7, num_ds=None):
         # self.train_ds = Dataset(self.input_shape, self.num_classes, batch_size, augmentations, is_training=True).get_dataset(train_filename)
         # self.test_ds = Dataset(self.input_shape, self.num_classes, batch_size, augmentations, is_training=False).get_dataset(test_filename)
-        self.train_ds, self.test_ds = Dataset(self.input_shape, self.num_classes, batch_size, augmentations, is_training=False).get_dataset(filename)
+        self.train_ds, self.test_ds = Dataset(self.input_shape, self.num_classes, batch_size, augmentations, is_training=False).get_dataset(filename, split_rate, num_ds)
     
     def normalization(self, image):
         return (image - np.min(image)) / (np.max(image) - np.min(image))

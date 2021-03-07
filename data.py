@@ -139,16 +139,19 @@ class Dataset:
         return pred[64:64+image.shape[0], 64:64+image.shape[1], 64:64+image.shape[2]]
 
 
-    def get_dataset(self, filename, split_rate=0.7):
+    def get_dataset(self, filename, split_rate=0.7, num_ds=None):
         if filename.split(".")[-1] == 'gzip':
             compression_type = 'GZIP'
         else:
             compression_type = None
 
+        if num_ds==None:
+            self.num_ds = len([1 for _ in tf.data.TFRecordDataset(filename, compression_type)])
+        else:
+            self.num_ds = num_ds
+        print("Number of Dataset :", self.num_ds)
 
         if split_rate > 0:
-            num_ds = len([1 for _ in tf.data.TFRecordDataset(filename, compression_type='GZIP')])
-
             train_size = int(split_rate * num_ds)
             val_size = int((1-split_rate) * num_ds)
             # test_size = int(0.15 * num_ds)
