@@ -99,10 +99,23 @@ class Dataset:
         label = tf.squeeze(label)
         return image, label
 
+    @tf.function
+    def padding3d(self, image, label):
+        input_shape = tf.constant(self.input_shape)
+
+        comp = (input_shape - image.shape)
+        padding = np.where(comp > 0, tf.cast(np.ceil(comp / 2), np.int32), 0)
+
+        padded_image = tf.pad(image, tf.stack([padding, padding], axis=1))
+        padded_label = tf.pad(label, tf.stack([padding, padding], axis=1))
+        return padded_image, padded_label
+
 
     def preprocess_data(self, image, label):
 
-        preprocess_funcs = {'resize' : self.resize_data, 'random_crop' : self.random_crop}
+        preprocess_funcs = {'resize' : self.resize_data, 
+                            'random_crop' : self.random_crop,
+                            'padding3d' : self.padding3d}
 
         for aug_name in self.augmentations:
             aug_func = preprocess_funcs[aug_name]
