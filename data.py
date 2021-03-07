@@ -99,10 +99,10 @@ class Dataset:
         label = tf.squeeze(label)
         return image, label
 
-    @tf.function
+    # @tf.function
     def padding3d(self, image, label):
         # print(self.input_shape[:-1], image.shape)
-        comp = np.array(self.input_shape[:-1]) - image.shape
+        comp = tf.convert_to_tensor((self.input_shape[:-1]) - tf.convert_to_tensor(image.shape)
         padding = tf.where(comp > 0, tf.cast(tf.math.ceil(comp / 2), tf.int32), 0)
 
         padded_image = tf.pad(image, tf.stack([padding, padding], axis=1))
