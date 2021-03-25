@@ -1,6 +1,0 @@
-README.md
-setup.py
-junet.egg-info/PKG-INFO
-junet.egg-info/SOURCES.txt
-junet.egg-info/dependency_links.txt
-junet.egg-info/top_level.txt
