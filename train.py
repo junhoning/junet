@@ -56,6 +56,8 @@ class Model:
             model = models.res_unet_3d.get_model(self.input_shape, self.num_classes)
         elif model_name == 'vanilla_3d':
             model = models.vanilla_unet_3d.get_model(self.input_shape, self.num_classes)
+        elif model_name == 'vanilla_3d_2':
+            model = models.vanilla_unet_3d_2.get_model(self.input_shape, self.num_classes)
         else:
             raise "Please select from (vanilla, xception_3d, dense_3d, resnet_3d, vanilla_3d)"
         print(f'Model is {model_name}')
