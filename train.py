@@ -73,10 +73,10 @@ class Model:
     
     def set_optm(self, optm='adam', learning_rate=0.001, lr_schedule=False):
         if lr_schedule:
-            lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+            learning_rate = tf.keras.optimizers.schedules.ExponentialDecay(
                 learning_rate,
-                decay_steps=200,
-                decay_rate=0.9,
+                decay_steps=1000,
+                decay_rate=0.96,
                 staircase=True
                 )
 
