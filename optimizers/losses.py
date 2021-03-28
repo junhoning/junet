@@ -23,9 +23,13 @@ class Losses:
         return 1-tf.reduce_mean(numerator / (denominator + epsilon))
 
     def bce_dice_loss(self, y_true, y_pred):
+        y_true = tf.cast(y_true, tf.float32)
+        y_pred = tf.cast(y_pred, tf.float32)
         return tf.keras.losses.CategoricalCrossentropy(y_true, y_pred) + self.soft_dice_loss(y_true, y_pred)
 
     def bce_logdice_loss(self, y_true, y_pred):
+        y_true = tf.cast(y_true, tf.float32)
+        y_pred = tf.cast(y_pred, tf.float32)
         return tf.keras.losses.CategoricalCrossentropy(y_true, y_pred) - tf.math.log(1. - self.soft_dice_loss(y_true, y_pred))
 
 
