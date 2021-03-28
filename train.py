@@ -188,8 +188,8 @@ class Model:
                 disp_idx = np.random.randint(images.shape[1])
 
                 tf.summary.image('input_image', reduce_dim(images, False), epoch)
-                tf.summary.image('preds_image', self.normalization(reduce_dim(self.train_preds)), epoch)
-                tf.summary.image('label_image', self.normalization(reduce_dim(labels)), epoch)
+                tf.summary.image('preds_image', self.normalization(reduce_dim(self.train_preds)).astype(np.float32), epoch)
+                tf.summary.image('label_image', self.normalization(reduce_dim(labels)).astype(np.float32), epoch)
 
             for images, labels in notebook.tqdm(self.test_ds):
                 self.test_images = images
@@ -203,8 +203,8 @@ class Model:
 
                 disp_idx = np.random.randint(images.shape[1])
                 tf.summary.image('input_image', reduce_dim(images, False), epoch)
-                tf.summary.image('preds_image', self.normalization(reduce_dim(self.test_preds)), epoch)
-                tf.summary.image('label_image', self.normalization(reduce_dim(labels)), epoch)
+                tf.summary.image('preds_image', self.normalization(reduce_dim(self.test_preds)).astype(np.float32), epoch)
+                tf.summary.image('label_image', self.normalization(reduce_dim(labels)).astype(np.float32), epoch)
 
                 if self.is_hparams:
                     hp.hparams(self.hparams)
