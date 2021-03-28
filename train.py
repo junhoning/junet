@@ -103,7 +103,7 @@ class Model:
             # training=True is only needed if there are layers with different
             # behavior during training versus inference (e.g. Dropout).
             predictions = self.model(images, training=True)
-            Losses = losses.Losses('soft_dice_loss')
+            Losses = losses.Losses('bce_logdice_loss')
             loss = Losses.loss_function(labels, predictions)
             # en_loss = tf.keras.losses.categorical_crossentropy(labels, predictions)
             
