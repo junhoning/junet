@@ -152,7 +152,7 @@ class Dataset:
 
 
     def get_dataset(self, filename, split_rate=0.7, num_ds=None):
-        if filename.split(".")[-1] == 'gzip':
+        if filename.lower().endswith('gzip'):
             compression_type = 'GZIP'
         else:
             compression_type = None
